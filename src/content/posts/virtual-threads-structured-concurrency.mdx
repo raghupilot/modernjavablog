@@ -1,0 +1,51 @@
+---
+title: "The concurrency revolution: virtual threads, structured concurrency, and scoped values"
+description: "How virtual threads and structured concurrency let you write simple, blocking-style code that scales like reactive code — without the reactive complexity."
+publishDate: 2026-07-01
+track: java
+jdkVersion: "21-26"
+featureStatus: preview
+difficulty: intermediate
+tags: [concurrency, virtual-threads, structured-concurrency, scoped-values]
+---
+
+For decades, Java bound every `java.lang.Thread` 1:1 to an OS thread. Virtual threads decouple this,
+letting millions of lightweight threads run concurrently on a small pool of platform threads.
+Structured concurrency and scoped values build on top of this: they treat a group of related tasks
+as a single logical unit of work, and let you share immutable data across that unit safely.
+
+- **Virtual threads** — final since JDK 21
+- **Structured concurrency** and **scoped values** — in late preview as of JDK 26
+
+## Architectural usage
+
+This is the death knell for complex, hard-to-debug reactive programming paradigms. If you're building
+high-throughput cloud-native APIs or handling massive fan-out requests in an AWS-style ecosystem, you
+can return to simple, synchronous, blocking I/O code. It lets you build robust application-level
+routing and resilience — using libraries like Spring Cloud Gateway or Resilience4j — without
+thread-pool exhaustion.
+
+<div class="callout">
+The practical shift: code that used to require <code>CompletableFuture</code> chains or a reactive
+stack to avoid blocking a scarce platform thread can now just block — because the thread being
+blocked is virtual, and virtually free.
+</div>
+
+## Code example
+
+```java
+// Structured Concurrency (Preview in recent JDKs)
+try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+    Supplier<String> user = scope.fork(() -> fetchUserProfile(userId));
+    Supplier<List<Order>> orders = scope.fork(() -> fetchUserOrders(userId));
+
+    scope.join();           // Join both forks
+    scope.throwIfFailed();  // Propagate errors automatically
+
+    // Safely consume results
+    return new UserDashboard(user.get(), orders.get());
+}
+```
+
+Both forks run on their own virtual thread. If either fails, `ShutdownOnFailure` cancels the sibling
+automatically — no manual cleanup, no leaked tasks.

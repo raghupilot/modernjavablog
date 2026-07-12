@@ -1,0 +1,27 @@
+---
+title: "Modern networking: native HTTP/3 support in java.net.http"
+description: "JDK 26 brings HTTP/3 to the standard HttpClient, resolving head-of-line blocking for cross-region microservice and partner API traffic."
+publishDate: 2026-06-03
+track: enterprise
+jdkVersion: "26"
+featureStatus: final
+difficulty: intro
+tags: [http3, quic, networking, http-client]
+---
+
+JDK 26 brought native support for HTTP/3 to the standard `java.net.http.HttpClient`. HTTP/3 is built
+on QUIC — a UDP-based protocol — rather than TCP, which resolves the head-of-line blocking issues
+that plagued older protocols over unreliable networks.
+
+## Architectural usage
+
+If your microservices communicate across diverse geographic regions, or connect to external partner
+APIs, HTTP/3 noticeably reduces connection setup latency and improves resilience against packet
+loss. It's a largely seamless upgrade for inter-service communication speed if you're already on the
+native `HttpClient` — most of the change is at the transport layer, not your call sites.
+
+<div class="callout">
+Before flipping this on for production inter-service traffic, check your network path: HTTP/3 relies
+on UDP, and some corporate proxies, load balancers, or restrictive security groups block or
+deprioritize UDP traffic by default. Validate the whole hop, not just the client and server.
+</div>

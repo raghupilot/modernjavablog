@@ -1,0 +1,9 @@
+---
+interface Props {
+  label: string;
+  status?: 'preview' | 'incubating' | 'stable' | 'final';
+}
+const { label, status } = Astro.props;
+const cls = status ? `tag-chip status-${status}` : 'tag-chip';
+---
+<span class={cls}>{label}</span>

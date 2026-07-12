@@ -1,0 +1,42 @@
+---
+title: "Data-oriented programming: pattern matching and primitives"
+description: "How record patterns, exhaustive switches, and primitive pattern matching move domain logic out of object hierarchies and into declarative blocks."
+publishDate: 2026-06-24
+track: java
+jdkVersion: "21-26"
+featureStatus: incubating
+difficulty: intermediate
+tags: [pattern-matching, records, switch-expressions, data-oriented-programming]
+---
+
+Java has progressively introduced data-oriented programming (DOP) features. JDK 21 gave us exhaustive
+switch expressions and record deconstruction. JDK 22 added unnamed variables (`_`), and releases up
+through JDK 26 have expanded pattern matching to handle primitive types (`int`, `long`, `double`)
+directly in `instanceof` and `switch`.
+
+## Architectural usage
+
+This shifts domain logic from being scattered across object hierarchies to being co-located in
+declarative, highly readable blocks. It's especially useful for parsing heterogeneous JSON events
+from streaming platforms, or handling varied event types across microservices, without endless
+`if-else` chains.
+
+## Code example
+
+```java
+// JDK 21+ Record Pattern with JDK 25+ Primitive Pattern Matching
+public String processEvent(Event event) {
+    return switch (event) {
+        case Payment(String id, double amount) when amount > 10000 -> "Large Transaction: " + id;
+        case Payment(String id, double amount) -> "Standard Transaction: " + id;
+        case Login(String user, int loginAttempts) -> "User " + user + " attempts: " + loginAttempts;
+        case null -> "Unknown event";
+    };
+}
+```
+
+<div class="callout">
+Notice there's no default branch needed once every case is covered — the compiler checks
+exhaustiveness against the sealed hierarchy or record shapes, so a new event type surfaces as a
+compile error everywhere it isn't handled, not a runtime surprise.
+</div>

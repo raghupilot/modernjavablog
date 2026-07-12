@@ -1,0 +1,43 @@
+---
+title: "Language ergonomics: flexible constructors and stream gatherers"
+description: "Flexible constructor bodies enable fail-fast validation before super(), and Stream Gatherers make stateful, custom pipeline stages a first-class citizen."
+publishDate: 2026-05-27
+track: java
+jdkVersion: "24-25"
+featureStatus: final
+difficulty: intro
+tags: [constructors, streams, gatherers, language-features]
+---
+
+Java has removed two long-standing annoyances. Flexible constructor bodies (JEP 513) finally let you
+run logic before calling `super()` or `this()` in a constructor. Stream gatherers (JEP 485) extend
+the Stream API with custom intermediate operations.
+
+## Architectural usage
+
+Flexible constructors enable fail-fast input validation before an expensive superclass allocation
+occurs — a core tenet of defensive, secure programming. Stream gatherers let you build complex,
+reusable data transformation pipelines — windowing, stateful filtering — that were previously
+awkward to express, keeping business logic clean and chainable instead of dropping into an imperative
+loop.
+
+## Code example
+
+```java
+// Flexible Constructor Bodies (JDK 25)
+public class ValidatedAccount extends Account {
+    public ValidatedAccount(String accountId) {
+        if (accountId == null || accountId.isBlank()) {
+            throw new IllegalArgumentException("Invalid ID");
+        }
+        // Calculation and validation happens BEFORE super()
+        super(accountId.trim());
+    }
+}
+```
+
+<div class="callout">
+Before JDK 25, that validation either had to live in a static factory method or duplicate itself
+after the (already-completed) super constructor call. Now the constructor itself can refuse to build
+a half-valid object in the first place.
+</div>

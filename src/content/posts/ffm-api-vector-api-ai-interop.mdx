@@ -1,0 +1,45 @@
+---
+title: "High-performance AI interop: the FFM API and Vector API"
+description: "How the Foreign Function & Memory API and the Vector API let Java bind directly to native ML libraries and CPU SIMD instructions — without JNI's fragility."
+publishDate: 2026-06-17
+track: agentic-ai
+jdkVersion: "22-26"
+featureStatus: incubating
+difficulty: advanced
+tags: [ffm-api, vector-api, native-interop, ai]
+---
+
+The Foreign Function & Memory (FFM) API replaces the fragile, slow Java Native Interface (JNI). It
+lets Java programs safely and efficiently invoke native code (C/C++) and manage off-heap memory.
+Paired with the Vector API, Java can tap directly into CPU SIMD instructions.
+
+## Architectural usage
+
+This is the foundation for an AI-first Java ecosystem. Instead of reaching for Python by default,
+you can bind directly to optimized native ML libraries — the kind of engines behind TensorFlow or
+PyTorch — or run LLM inference within your Java runtime with near-zero overhead. It bridges enterprise
+backend stability with the mathematical computation cutting-edge AI workloads need.
+
+## Code example
+
+```java
+// FFM API calling a native C function (e.g., from an AI C-library)
+try (Arena arena = Arena.ofConfined()) {
+    Linker linker = Linker.nativeLinker();
+    SymbolLookup stdlib = linker.defaultLookup();
+
+    MethodHandle rad = linker.downcallHandle(
+        stdlib.find("random").orElseThrow(),
+        FunctionDescriptor.of(ValueLayout.JAVA_INT)
+    );
+
+    int randomValue = (int) rad.invokeExact();
+    System.out.println("Native random: " + randomValue);
+}
+```
+
+<div class="callout">
+The <code>Arena</code> here is doing the memory-safety work JNI never gave you for free: every
+off-heap allocation tied to it is released deterministically when the try-with-resources block
+exits, instead of relying on native code to clean up after itself.
+</div>

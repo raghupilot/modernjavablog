@@ -1,0 +1,41 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TagChip from '../components/TagChip.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  track: string;
+  jdkVersion?: string;
+  featureStatus?: 'preview' | 'incubating' | 'stable' | 'final';
+  difficulty: string;
+  publishDate: Date;
+}
+
+const { title, description, track, jdkVersion, featureStatus, difficulty, publishDate } = Astro.props;
+
+const trackLabels: Record<string, string> = {
+  java: 'Modern Java',
+  enterprise: 'Enterprise Patterns',
+  'agentic-ai': 'Agentic AI',
+};
+
+const dateStr = publishDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+---
+<BaseLayout title={`${title} — Release Notes for Humans`} description={description}>
+  <article>
+    <div class="article-header">
+      <span class="track-label">{trackLabels[track] ?? track}</span>
+      <h1>{title}</h1>
+      <p class="post-desc">{description}</p>
+      <div class="article-meta">
+        {jdkVersion && <TagChip label={`JDK ${jdkVersion}`} status={featureStatus} />}
+        <TagChip label={difficulty} />
+        <span class="track-label">{dateStr}</span>
+      </div>
+    </div>
+    <div class="article-body">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>

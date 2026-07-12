@@ -1,0 +1,29 @@
+---
+title: "Advanced JVM ergonomics: compact object headers and G1 GC throughput"
+description: "How Project Lilliput's compact object headers and G1 GC synchronization improvements translate into higher container density and lower cloud spend."
+publishDate: 2026-06-10
+track: enterprise
+jdkVersion: "24-26"
+featureStatus: stable
+difficulty: intermediate
+tags: [jvm, garbage-collection, g1gc, memory, cost-optimization]
+---
+
+Project Lilliput has borne fruit with compact object headers, reducing the metadata overhead of
+every Java object from 96–128 bits down to 64 bits. JDK 26 layered on specific throughput
+improvements for the G1 garbage collector by reducing synchronization between application and GC
+threads.
+
+## Architectural usage
+
+This translates directly into lower cloud compute bills. A smaller heap footprint means higher
+deployment density per container. When you look at heap dumps or GC logs in APM tools like Dynatrace
+or AppDynamics, expect noticeably fewer GC pauses, a tighter memory layout, and better CPU cache
+locality — which means your instances handle higher transaction volumes without scaling out.
+
+<div class="callout">
+Practical takeaway for capacity planning: if you're sizing container memory limits based on JDK 17
+or 21 heap-dump baselines, re-baseline after upgrading. The reduced per-object overhead can shift
+where your actual memory ceiling sits, and re-using old headroom numbers leaves cost savings on the
+table.
+</div>
