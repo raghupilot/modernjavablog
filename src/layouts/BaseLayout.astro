@@ -4,7 +4,7 @@ interface Props {
   title: string;
   description?: string;
 }
-const { title, description = 'Modern Java, distributed systems, and agentic AI, explained for people who ship.' } = Astro.props;
+const { title, description = 'Modern Java features and usage — practical patterns for enterprise distributed systems and agentic AI.' } = Astro.props;
 // Astro's BASE_URL never carries a trailing slash (even when base is "/"), so build
 // links manually instead of relying on naive string concatenation.
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -21,7 +21,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href={`${base}/`}>
-          <span class="dot">&#9656;</span> Release Notes for Humans
+          <span class="dot">&#9656;</span> Modern Java Features and Usage
         </a>
         <nav class="site-nav">
           <a href={`${base}/`}>All posts</a>
@@ -34,8 +34,5 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <main class="wrap">
       <slot />
     </main>
-    <footer class="site-footer">
-      <div class="wrap">Written while building distributed systems and reading JEPs so you don't have to.</div>
-    </footer>
   </body>
 </html>

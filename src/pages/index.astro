@@ -12,21 +12,24 @@ const trackLabels: Record<string, string> = {
   'agentic-ai': 'Agentic AI',
 };
 ---
-<BaseLayout title="Release Notes for Humans">
+<BaseLayout title="Modern Java Features and Usage">
   <p class="post-desc" style="margin-bottom: 2rem; font-size: 1.05rem;">
     Modern Java features, distributed systems patterns, and agentic AI — explained with the
     architectural context you need to actually use them.
   </p>
   <div class="post-list">
-    {allPosts.map((post) => (
-      <a class="post-card" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/posts/${post.id}/`}>
-        <div class="post-meta-row">
-          <span class="track-label">{trackLabels[post.data.track] ?? post.data.track}</span>
-          {post.data.jdkVersion && <TagChip label={`JDK ${post.data.jdkVersion}`} status={post.data.featureStatus} />}
-        </div>
-        <h2 class="post-title">{post.data.title}</h2>
-        <p class="post-desc">{post.data.description}</p>
-      </a>
+    {allPosts.map((post, i) => (
+      <>
+        {i > 0 && <hr class="post-separator" />}
+        <a class="post-card" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/posts/${post.id}/`}>
+          <div class="post-meta-row">
+            <span class="track-label">{trackLabels[post.data.track] ?? post.data.track}</span>
+            {post.data.jdkVersion && <TagChip label={`JDK ${post.data.jdkVersion}`} status={post.data.featureStatus} />}
+          </div>
+          <h2 class="post-title">{post.data.title}</h2>
+          <p class="post-desc">{post.data.description}</p>
+        </a>
+      </>
     ))}
   </div>
 </BaseLayout>
