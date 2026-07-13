@@ -6,9 +6,6 @@ track: "java"
 tags: ["Java", "JVM", "Project Lilliput", "Performance"]
 ---
 
-import { ObjectHeaderVisualizer } from '../components/ObjectHeaderVisualizer.jsx';
-import { CloudCostCalculator } from '../components/CloudCostCalculator.tsx';
-
 ## About Project Lilliput
 
 Project Lilliput is an OpenJDK initiative focused on drastically reducing the memory footprint of Java objects. Historically, every single object instantiated in the HotSpot JVM carried a heavy metadata penalty: a 96-bit or 128-bit object header containing the Mark Word (used for locks, GC forwarding pointers, and identity hash codes) and the Class Word (a pointer to the object's class metadata).
