@@ -1,8 +1,8 @@
 ---
-title: "Project Lilliput: Shrinking the Java Object Header for Cloud-Native Scale"
-summary: "An architectural deep-dive into Project Lilliput, detailing how compact object headers drastically reduce heap consumption and optimize cloud deployment density."
-pubDate: 2026-07-20
-tags: ["Java", "JVM", "Project Lilliput", "Performance"]
+title: "Project Lilliput: Shrinking the Java Object Header"
+summary: "An architectural deep-dive into Project Lilliput."
+pubDate: "2026-07-20"
+tags: ["Java", "JVM"]
 ---
 
 import { ObjectHeaderVisualizer } from '../components/ObjectHeaderVisualizer.jsx';
@@ -28,7 +28,9 @@ For enterprise architects, Project Lilliput is less about writing new code and e
 
 ## Scenario: High-Throughput Cloud Event Processing
 
+
 Imagine a distributed microservice deployed in an AWS ecosystem, designed to consume and process millions of JSON events per minute from a high-throughput stream (like Kinesis or Kafka). 
+
 
 Every incoming payload is deserialized into a Java Record or DTO. In a traditional JVM, millions of these small data-carrier objects bloat the heap quickly, triggering frequent GC cycles and forcing you to over-provision the memory on your ECS Fargate tasks or EKS pods to prevent Out-Of-Memory (OOM) crashes.
 
