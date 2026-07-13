@@ -12,7 +12,6 @@ Project Lilliput is an OpenJDK initiative focused on drastically reducing the me
 
 Lilliput aims to compress this overhead. By streamlining how the JVM handles object identity and class pointers, the project successfully reduces the object header down to **64 bits** (with future goals targeting 32 bits). In applications dealing with millions of small objects, this seemingly minor bit-level reduction fundamentally changes the memory economics of the JVM.
 
-<ObjectHeaderVisualizer before={128} after={64} />
 
 ## Practical Usage
 
@@ -37,7 +36,6 @@ Every incoming payload is deserialized into a Java Record or DTO. In a tradition
 2. The memory pressure on the G1 Garbage Collector eases, eliminating latency spikes during peak traffic.
 3. The cluster auto-scaler can delay spinning up new application instances because the existing instances can safely buffer a larger volume of objects in memory.
 
-<CloudCostCalculator trafficVolume="high" instanceType="m5.large" />
 
 ## References
 
