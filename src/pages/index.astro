@@ -12,23 +12,41 @@ const trackLabels: Record<string, string> = {
   'agentic-ai': 'Agentic AI',
 };
 ---
-<BaseLayout title="Modern Java Features and Usage">
-  <p class="post-desc" style="margin-bottom: 2rem; font-size: 1.05rem;">
-    Modern Java features, distributed systems patterns, and agentic AI — explained with the
-    architectural context you need to actually use them.
-  </p>
-  <div class="post-list">
+<BaseLayout title="Modern Java Architecture Blog">
+  <section class="mb-12">
+    <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 mb-4">
+      Engineering at Scale
+    </h1>
+    <p class="post-desc text-lg text-slate-600 max-w-2xl">
+      Modern Java features, distributed systems patterns, and agentic AI — explained with the
+      architectural context you need to actually use them.
+    </p>
+  </section>
+
+  <div class="post-list space-y-8">
     {allPosts.map((post, i) => (
       <>
-        {i > 0 && <hr class="post-separator" />}
-        <a class="post-card" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/posts/${post.id}/`}>
-          <div class="post-meta-row">
-            <span class="track-label">{trackLabels[post.data.track] ?? post.data.track}</span>
-            {post.data.jdkVersion && <TagChip label={`JDK ${post.data.jdkVersion}`} status={post.data.featureStatus} />}
-          </div>
-          <h2 class="post-title">{post.data.title}</h2>
-          <p class="post-desc">{post.data.description}</p>
-        </a>
+        {i > 0 && <hr class="post-separator border-t border-slate-100" />}
+        <article class="group">
+          {/* Note the updated href logic for routing */}
+          <a class="post-card block hover:bg-slate-50 p-4 -mx-4 rounded-xl transition" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/posts/${post.id}/`}>
+            <div class="post-meta-row flex gap-2 items-center mb-2 text-sm">
+              <span class="track-label font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                {trackLabels[post.data.track] ?? post.data.track}
+              </span>
+              {post.data.jdkVersion && <TagChip label={`JDK ${post.data.jdkVersion}`} status={post.data.featureStatus} />}
+              <span class="text-slate-400">|</span>
+              <time class="text-slate-500 font-mono text-xs">
+                {post.data.publishDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </time>
+            </div>
+            <h2 class="post-title text-2xl font-bold text-slate-900 group-hover:text-indigo-600 transition mb-2">
+              {post.data.title}
+            </h2>
+            <p class="post-desc text-slate-600 line-clamp-2">{post.data.description}</p>
+            <span class="text-indigo-600 font-medium text-sm mt-3 inline-block group-hover:underline">Read full article &rarr;</span>
+          </a>
+        </article>
       </>
     ))}
   </div>
