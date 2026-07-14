@@ -244,3 +244,18 @@ pre {
   width: 16px;
   height: 16px;
 }
+
+/* Add this to your existing global.css */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem; /* Ensures the header doesn't cover the H2 */
+}
+
+.article-tags .tag-chip {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}

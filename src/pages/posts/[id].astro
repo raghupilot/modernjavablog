@@ -11,7 +11,8 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+// 1. Extract 'headings' along with Content
+const { Content, headings } = await render(post);
 ---
 <PostLayout
   title={post.data.title}
@@ -21,6 +22,7 @@ const { Content } = await render(post);
   featureStatus={post.data.featureStatus}
   difficulty={post.data.difficulty}
   publishDate={post.data.publishDate}
-  tags={post.data.tags}  >
+  tags={post.data.tags}
+  headings={headings}  >
   <Content />
 </PostLayout>
