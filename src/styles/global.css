@@ -51,10 +51,12 @@ pre {
   background: var(--bg-inset);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.1rem 1.25rem;
+  /* Adjusted top padding to make room for the copy button */
+  padding: 3rem 1.25rem 1.1rem; 
   overflow-x: auto;
   font-size: 0.87rem;
   line-height: 1.6;
+  position: relative; /* Essential for absolute positioning of copy button */
 }
 
 :not(pre) > code {
@@ -107,9 +109,7 @@ pre {
 
 .site-nav a:hover { color: var(--text-primary); }
 
-/* Release tag chip -- the signature element: every post carries a git-tag-style
-   badge for the JDK version it documents, since the whole taxonomy is organized
-   by version/feature-status rather than by date. */
+/* Release tag chip */
 .tag-chip {
   display: inline-flex;
   align-items: center;
@@ -216,4 +216,31 @@ pre {
   padding: 1rem 1.25rem;
   margin: 1.5rem 0;
   font-size: 0.95rem;
+}
+
+/* --- Code Block Copy Button --- */
+.copy-code-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.4rem;
+  background-color: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-code-btn:hover {
+  background-color: var(--border);
+  color: var(--text-primary);
+}
+
+.copy-code-btn svg {
+  width: 16px;
+  height: 16px;
 }

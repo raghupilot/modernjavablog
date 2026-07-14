@@ -13,4 +13,10 @@ export default defineConfig({
   site,
   base,
   integrations: [mdx()],
+  markdown: {
+    shikiConfig: {
+      theme: 'github-dark',
+      wrap: true, // Prevents horizontal scrolling issues on mobile
+    },
+  },
 });
