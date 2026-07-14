@@ -1,9 +1,9 @@
 ---
 title: "Java 26 for AI Engineers: Building Enterprise-Grade AI Infrastructure"
-description: "Why JDK 26 is the turning point for enterprise AI, featuring FFM, the Vector API, Structured Concurrency, and Helidon AI for agentic microservices."
+description: "Why JDK 26 is the turning point for enterprise AI, featuring FFM, the Vector API, Structured Concurrency, HTTP/3, and Helidon AI for agentic microservices."
 publishDate: "2026-07-25"
 track: "agentic-ai"
-tags: ["Java", "AI", "FFM", "Vector API", "Helidon AI", "LangChain4j", "Agents"]
+tags: ["Java", "AI", "FFM", "Vector API", "HTTP/3", "Helidon AI", "LangChain4j"]
 ---
 
 import Callout from '../../components/Callout.astro';
@@ -68,7 +68,35 @@ public AIResponse synthesizeInsights(String prompt) throws InterruptedException 
 }
 ```
 
-## 4. Ecosystem Enablement: Helidon AI and the Java Verified Portfolio
+## 4. HTTP/3 Support: The Backbone of Distributed AI
+*(Finalized - JEP 517)*
+
+When orchestrating multi-agent systems or calling external LLM providers, network latency and reliability become primary architectural bottlenecks. JDK 26 introduces native HTTP/3 support directly into `java.net.http`. 
+
+Because HTTP/3 is built on QUIC (UDP) rather than TCP, it eliminates head-of-line blocking. If a packet drops on a flaky connection, only that specific stream is delayed, not the entire pipeline. 
+
+### Architectural Usage in AI
+This is a game-changer for cloud-native AI deployments. If your agentic workflows are executing cross-region tool calls, or your high-throughput RAG services are rapidly querying distributed vector databases, HTTP/3 provides massive resilience. Coupling this native client with application-level libraries like Resilience4j gives you exact control over granular failover scenarios without the overhead of a heavy service mesh.
+
+```java
+// Example: Reliable LLM API Client using HTTP/3
+HttpClient client = HttpClient.newBuilder()
+    .version(HttpClient.Version.HTTP_3) // Prefer HTTP/3 with fallback to HTTP/2
+    .connectTimeout(Duration.ofSeconds(10))
+    .build();
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("[https://api.openai.com/v1/chat/completions](https://api.openai.com/v1/chat/completions)"))
+    .header("Content-Type", "application/json")
+    .POST(BodyPublishers.ofString(jsonPayload))
+    .build();
+
+client.sendAsync(request, BodyHandlers.ofString())
+    .thenApply(HttpResponse::body)
+    .thenAccept(System.out::println);
+```
+
+## 5. Ecosystem Enablement: Helidon AI and the Java Verified Portfolio
 
 The release of JDK 26 coincided with Oracle's launch of the **Java Verified Portfolio (JVP)**, which brought commercial, enterprise-grade support to a curated set of frameworks. The standout addition for AI architects is **Helidon AI**.
 
@@ -78,7 +106,7 @@ Helidon (Oracle's cloud-native microservices framework) has been explicitly exte
 3.  **MCP (Model Context Protocol):** Allowing standardized, secure context retrieval for AI models.
 
 ### Scenario: The Helidon AI Recipe Assistant
-If you examine community architectures (like the *Helidon Eats* sample application), you can see how cleanly this framework handles enterprise RAG (Retrieval-Augmented Generation). Instead of sending an entire Oracle database to an LLM, the Java application controls the grounding context securely.
+If you examine community architectures (like the *Helidon Eats* sample application), you can see how cleanly this framework handles enterprise RAG. Instead of sending an entire database to an LLM, the Java application securely controls the grounding context.
 
 ```java
 // Helidon AI + LangChain4j integration example
@@ -91,7 +119,7 @@ WebServer server = WebServer.builder()
             // 1. Generate Vector from user prompt
             float[] queryEmbedding = embeddingModel.embed(question).content().vector();
             
-            // 2. Query Oracle AI Database Free for cosine similarity hits
+            // 2. Query Database for cosine similarity hits
             List<RecipeHit> hits = repository.findSimilar(queryEmbedding);
             
             // 3. Ground the LLM with strict context
@@ -105,4 +133,4 @@ WebServer server = WebServer.builder()
 
 ## The Verdict
 
-JDK 26 is the point where Java transitions from being "just the backend" to being a first-class citizen in the AI ecosystem. By combining low-level JVM enhancements (FFM, Vector API) with high-level, supported frameworks (Helidon AI within the JVP), architects can build end-to-end agentic systems that are strongly typed, easily monitored, and massively scalable.
+JDK 26 is the point where Java transitions from being "just the backend" to being a first-class citizen in the AI ecosystem. By combining low-level JVM enhancements (FFM, Vector API, HTTP/3) with high-level, supported frameworks (Helidon AI within the JVP), architects can build end-to-end agentic systems that are strongly typed, easily monitored, and massively scalable.
