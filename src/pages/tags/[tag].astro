@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TagChip from '../../components/TagChip.astro';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+  
+  // Extract all unique tags
+  const uniqueTags = [...new Set(allPosts.map((post) => post.data.tags).flat())];
+
+  // Generate a route for each tag, passing the filtered posts as props
+  return uniqueTags.map((tag) => {
+    const filteredPosts = allPosts.filter((post) => post.data.tags.includes(tag));
+    return {
+      params: { tag },
+      props: { posts: filteredPosts },
+    };
+  });
+}
+
+const { tag } = Astro.params;
+const { posts } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Sort posts by date
+const sortedPosts = posts.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+---
+
+<BaseLayout title={`Posts tagged with #${tag} — Modern Java`} description={`All architectural deep dives regarding ${tag}.`}>
+  <section style="margin-bottom: 3rem;">
+    <a href={`${base}/`} style="color: #6366f1; text-decoration: none; font-size: 0.9rem; font-weight: 500;">&larr; Back to all posts</a>
+    <h1 style="margin-top: 1rem; font-size: 2.5rem;">Tag: #{tag}</h1>
+    <p style="color: #64748b; font-size: 1.1rem;">Found {posts.length} article{posts.length !== 1 ? 's' : ''}.</p>
+  </section>
+
+  <div class="post-list">
+    {sortedPosts.map((post, i) => (
+      <>
+        {i > 0 && <hr class="post-separator" />}
+        <a class="post-card" href={`${base}/posts/${post.id}/`}>
+          <h2 class="post-title">{post.data.title}</h2>
+          <p class="post-desc">{post.data.description}</p>
+        </a>
+      </>
+    ))}
+  </div>
+</BaseLayout>
