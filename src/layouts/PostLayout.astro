@@ -61,7 +61,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       )}
     </article>
 
-    {toc.length > 0 && (
+    {toc.length >= 3 && (
       <nav class="toc-sidebar">
         <h4>On this page</h4>
         <ul>
@@ -86,9 +86,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   .toc-sidebar h4 { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; }
   .toc-sidebar ul { list-style: none; padding: 0; margin: 0; }
-  .toc-sidebar li { margin-bottom: 0.6rem; }
+  .toc-sidebar li { margin-bottom: 0.8rem; line-height: 1.4; }
   .toc-sidebar li.depth-3 { margin-left: 0.75rem; }
-  .toc-sidebar a { font-size: 0.85rem; color: var(--text-secondary); }
+  .toc-sidebar a { font-size: 0.9rem; color: var(--text-secondary); }
   .toc-sidebar a:hover { color: var(--amber); }
 
   .article-tags { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
@@ -97,5 +97,5 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 </style>
 
 <script>
-  // ... (Keep your existing script here)
+  // ... (Keep your existing copy-code script here)
 </script>
