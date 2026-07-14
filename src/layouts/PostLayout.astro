@@ -16,7 +16,7 @@ interface Props {
 
 const { title, description, track, jdkVersion, featureStatus, difficulty, publishDate, tags = [], headings } = Astro.props;
 
-// Filter for only H2 and H3
+// Filter for only H2 and H3 for TOC
 const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
 
 const trackLabels: Record<string, string> = {
@@ -97,5 +97,37 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 </style>
 
 <script>
-  // ... (Keep your existing copy-code script here)
+  document.addEventListener('DOMContentLoaded', () => {
+    const codeBlocks = document.querySelectorAll('pre');
+
+    codeBlocks.forEach((block) => {
+      const button = document.createElement('button');
+      button.className = 'copy-code-btn';
+      button.setAttribute('aria-label', 'Copy code');
+      button.setAttribute('title', 'Copy code');
+
+      const copyIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+      const checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#35C9B0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+
+      button.innerHTML = copyIcon;
+      block.appendChild(button);
+
+      button.addEventListener('click', async () => {
+        const codeText = block.querySelector('code')?.innerText;
+        if (!codeText) return;
+
+        try {
+          await navigator.clipboard.writeText(codeText);
+          button.innerHTML = checkIcon;
+          button.style.borderColor = '#35C9B0';
+          setTimeout(() => {
+            button.innerHTML = copyIcon;
+            button.style.borderColor = '';
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy code: ', err);
+        }
+      });
+    });
+  });
 </script>
