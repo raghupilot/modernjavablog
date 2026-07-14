@@ -1,9 +1,9 @@
 ---
 title: "Java 26 for AI Engineers: Building Enterprise-Grade AI Infrastructure"
-description: "Why JDK 26 is the turning point for enterprise AI, featuring FFM, the Vector API, and Structured Concurrency for highly resilient LLM orchestration."
+description: "Why JDK 26 is the turning point for enterprise AI, featuring FFM, the Vector API, Structured Concurrency, and Helidon AI for agentic microservices."
 publishDate: "2026-07-25"
 track: "agentic-ai"
-tags: ["Java", "AI", "FFM", "Vector API", "Concurrency", "LLM"]
+tags: ["Java", "AI", "FFM", "Vector API", "Helidon AI", "LangChain4j", "Agents"]
 ---
 
 import Callout from '../../components/Callout.astro';
@@ -34,26 +34,19 @@ try (Arena arena = Arena.ofConfined()) {
 ```
 
 ## 2. The Vector API: Hardware-Accelerated Math
-*(Incubating)*
+*(Incubating - JEP 529)*
 
-AI is fundamentally about matrix multiplication and vector mathematics. The Vector API allows Java developers to explicitly write code that compiles down to CPU SIMD (Single Instruction, Multiple Data) instructions (like AVX-512 on Intel/AMD or NEON on ARM). 
-
-Instead of processing an array of floats one by one, the CPU can process 8, 16, or 32 of them in a single clock cycle.
+AI is fundamentally about matrix multiplication and vector mathematics. The Vector API allows Java developers to explicitly write code that compiles down to optimal CPU SIMD (Single Instruction, Multiple Data) instructions (like AVX-512 on Intel/AMD or NEON on ARM) at runtime. 
 
 ### Architectural Usage in AI
-If you are building a Retrieval-Augmented Generation (RAG) system, you need to calculate the **cosine similarity** between embedding vectors. Using the Vector API, you can write this logic purely in Java and achieve performance that rivals native C code, vastly speeding up local semantic search operations without requiring an external vector database for smaller datasets.
+If you are building a Retrieval-Augmented Generation (RAG) system, you need to calculate the **cosine similarity** between embedding vectors. Using the Vector API, you can write this logic purely in Java and achieve performance that rivals native C code (often yielding 4-8x speedups over scalar code), vastly speeding up local semantic search operations without requiring an external vector database for smaller datasets.
 
 ## 3. Structured Concurrency: Orchestrating Agentic Workflows
-*(Preview)*
+*(Preview - JEP 525)*
 
 While FFM handles the math, **Structured Concurrency** (paired with Virtual Threads) handles the orchestration. Modern AI applications are rarely a single API call; they are complex, multi-agent workflows. 
 
-Imagine an Agentic AI endpoint that needs to simultaneously:
-1. Query an OpenAI LLM.
-2. Query a local Anthropic model for a second opinion.
-3. Fetch context from a vector database.
-
-Structured Concurrency allows you to fan-out these highly latent I/O calls safely and cancel them cleanly if one fails or times out.
+Imagine an Agentic AI endpoint that needs to simultaneously query an OpenAI LLM, query a local Anthropic model for a second opinion, and fetch context from a vector database. Structured Concurrency allows you to fan-out these highly latent I/O calls safely and cancel them cleanly if one fails or times out.
 
 <Callout type="info" title="The Death of Thread Starvation">
   Because these API calls run on Virtual Threads, blocking while waiting for an LLM to generate tokens no longer consumes an OS thread. You can easily sustain tens of thousands of concurrent LLM requests on a single JVM instance.
@@ -75,13 +68,41 @@ public AIResponse synthesizeInsights(String prompt) throws InterruptedException 
 }
 ```
 
-## 4. Scoped Values: Secure AI Context Propagation
-*(Preview)*
+## 4. Ecosystem Enablement: Helidon AI and the Java Verified Portfolio
 
-When dealing with AI, you are constantly passing around context: API keys, user tenant IDs, and generation tokens. `ThreadLocal` variables were historically used for this, but they are mutable and memory-heavy (especially when dealing with millions of Virtual Threads).
+The release of JDK 26 coincided with Oracle's launch of the **Java Verified Portfolio (JVP)**, which brought commercial, enterprise-grade support to a curated set of frameworks. The standout addition for AI architects is **Helidon AI**.
 
-**Scoped Values** (`ScopedValue<T>`) allow you to securely and immutably pass data down the call stack. This is critical for building secure enterprise AI gateways where you must ensure that Tenant A's execution context absolutely cannot bleed into Tenant B's LLM generation thread.
+Helidon (Oracle's cloud-native microservices framework) has been explicitly extended to facilitate building **AI Agents as microservices**. It natively integrates with:
+1.  **Virtual Threads:** For massive concurrency.
+2.  **LangChain4j:** Supplying the Java abstractions for models, embeddings, and chat memory.
+3.  **MCP (Model Context Protocol):** Allowing standardized, secure context retrieval for AI models.
+
+### Scenario: The Helidon AI Recipe Assistant
+If you examine community architectures (like the *Helidon Eats* sample application), you can see how cleanly this framework handles enterprise RAG (Retrieval-Augmented Generation). Instead of sending an entire Oracle database to an LLM, the Java application controls the grounding context securely.
+
+```java
+// Helidon AI + LangChain4j integration example
+WebServer server = WebServer.builder()
+    .port(config.port())
+    .routing(routing -> routing
+        .get("/ask", (req, res) -> {
+            String question = req.query().first("q").orElse("What can I make with rhubarb?");
+            
+            // 1. Generate Vector from user prompt
+            float[] queryEmbedding = embeddingModel.embed(question).content().vector();
+            
+            // 2. Query Oracle AI Database Free for cosine similarity hits
+            List<RecipeHit> hits = repository.findSimilar(queryEmbedding);
+            
+            // 3. Ground the LLM with strict context
+            String context = formatHits(hits);
+            String answer = chatModel.chat("Context: " + context + "\nQuestion: " + question);
+            
+            json(res, answer);
+        })
+    ).build().start();
+```
 
 ## The Verdict
 
-JDK 26 is the point where Java transitions from being "just the backend" to being a first-class citizen in the AI ecosystem. By combining FFM for low-level performance with Virtual Threads for high-level orchestration, architects can build end-to-end AI systems that are strongly typed, easily monitored, and massively scalable.
+JDK 26 is the point where Java transitions from being "just the backend" to being a first-class citizen in the AI ecosystem. By combining low-level JVM enhancements (FFM, Vector API) with high-level, supported frameworks (Helidon AI within the JVP), architects can build end-to-end agentic systems that are strongly typed, easily monitored, and massively scalable.
