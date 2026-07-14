@@ -1,9 +1,9 @@
 ---
 title: "Java 26 for AI Engineers: Building Enterprise-Grade AI Infrastructure"
-description: "Why JDK 26 is the turning point for enterprise AI, featuring FFM, the Vector API, Structured Concurrency, HTTP/3, and Helidon AI for agentic microservices."
+description: "Why JDK 26 is the turning point for enterprise AI, featuring FFM, Vector API, Structured Concurrency, HTTP/3, and high-level frameworks like Spring AI and Quarkus."
 publishDate: "2026-07-25"
 track: "agentic-ai"
-tags: ["Java", "AI", "FFM", "Vector API", "HTTP/3", "Helidon AI", "LangChain4j"]
+tags: ["Java", "AI", "FFM", "Vector API", "Spring AI", "Quarkus", "LangChain4j"]
 ---
 
 import Callout from '../../components/Callout.astro';
@@ -76,7 +76,7 @@ When orchestrating multi-agent systems or calling external LLM providers, networ
 Because HTTP/3 is built on QUIC (UDP) rather than TCP, it eliminates head-of-line blocking. If a packet drops on a flaky connection, only that specific stream is delayed, not the entire pipeline. 
 
 ### Architectural Usage in AI
-This is a game-changer for cloud-native AI deployments. If your agentic workflows are executing cross-region tool calls, or your high-throughput RAG services are rapidly querying distributed vector databases, HTTP/3 provides massive resilience. Coupling this native client with application-level libraries like Resilience4j gives you exact control over granular failover scenarios without the overhead of a heavy service mesh.
+This is a game-changer for cloud-native AI deployments. If your agentic workflows are executing cross-region tool calls, or your high-throughput RAG services are rapidly querying distributed vector databases, HTTP/3 provides massive resilience. 
 
 ```java
 // Example: Reliable LLM API Client using HTTP/3
@@ -96,41 +96,59 @@ client.sendAsync(request, BodyHandlers.ofString())
     .thenAccept(System.out::println);
 ```
 
-## 5. Ecosystem Enablement: Helidon AI and the Java Verified Portfolio
+## 5. Ecosystem Enablement: Spring AI and Quarkus
 
-The release of JDK 26 coincided with Oracle's launch of the **Java Verified Portfolio (JVP)**, which brought commercial, enterprise-grade support to a curated set of frameworks. The standout addition for AI architects is **Helidon AI**.
+While JDK 26 provides the low-level mechanics (FFM, Vector, Virtual Threads, HTTP/3), enterprise architects rely on high-level frameworks to abstract the complexity of AI orchestration. Two frameworks have emerged as the standard for building real-world Java AI applications.
 
-Helidon (Oracle's cloud-native microservices framework) has been explicitly extended to facilitate building **AI Agents as microservices**. It natively integrates with:
-1.  **Virtual Threads:** For massive concurrency.
-2.  **LangChain4j:** Supplying the Java abstractions for models, embeddings, and chat memory.
-3.  **MCP (Model Context Protocol):** Allowing standardized, secure context retrieval for AI models.
+### Option A: Spring AI (The Enterprise Standard)
+If your architecture already handles application-level routing and resilience via the Spring ecosystem, **Spring AI** is the frictionless path forward. It applies familiar Spring design principles (`@Beans`, auto-configuration, templates) to the AI domain. 
 
-### Scenario: The Helidon AI Recipe Assistant
-If you examine community architectures (like the *Helidon Eats* sample application), you can see how cleanly this framework handles enterprise RAG. Instead of sending an entire database to an LLM, the Java application securely controls the grounding context.
+Because Spring Boot relies heavily on thread-per-request models (like Tomcat), the maturation of Virtual Threads in JDK 26 means Spring AI applications can handle massive LLM I/O bottlenecks without thread starvation.
 
 ```java
-// Helidon AI + LangChain4j integration example
-WebServer server = WebServer.builder()
-    .port(config.port())
-    .routing(routing -> routing
-        .get("/ask", (req, res) -> {
-            String question = req.query().first("q").orElse("What can I make with rhubarb?");
-            
-            // 1. Generate Vector from user prompt
-            float[] queryEmbedding = embeddingModel.embed(question).content().vector();
-            
-            // 2. Query Database for cosine similarity hits
-            List<RecipeHit> hits = repository.findSimilar(queryEmbedding);
-            
-            // 3. Ground the LLM with strict context
-            String context = formatHits(hits);
-            String answer = chatModel.chat("Context: " + context + "\nQuestion: " + question);
-            
-            json(res, answer);
-        })
-    ).build().start();
+// Spring AI RAG Implementation
+@RestController
+public class RagController {
+    private final ChatClient chatClient;
+
+    public RagController(ChatClient.Builder builder, VectorStore vectorStore) {
+        this.chatClient = builder
+            .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
+            .build();
+    }
+
+    @GetMapping("/ask")
+    public String ask(@RequestParam String query) {
+        return chatClient.prompt()
+            .user(query)
+            .call()
+            .content();
+    }
+}
 ```
+
+### Option B: Quarkus + LangChain4j (The Cloud-Native Standard)
+If you are deploying highly distributed microservices into an AWS container ecosystem (ECS Fargate or EKS) and care deeply about cloud compute density and cold starts, **Quarkus paired with LangChain4j** is the superior architectural choice.
+
+Quarkus is optimized for Kubernetes and allows you to compile your Java 26 application down to a native binary using GraalVM. Through the `quarkus-langchain4j` extension, you can define an AI Agent purely through declarative Java interfaces.
+
+```java
+// Quarkus + LangChain4j Declarative Agent Interface
+@RegisterAiService(chatMemoryProviderSupplier = RegisterAiService.BeanChatMemoryProviderSupplier.class)
+public interface LegalDocumentAgent {
+
+    @SystemMessage("""
+        You are a senior legal analyst. 
+        Analyze the provided document context and answer the user's question.
+        """)
+    String analyze(@UserMessage String question);
+}
+```
+
+<Callout type="tip" title="Architectural Choice">
+  Use **Spring AI** if you are integrating intelligence into a massive, established enterprise monolith or existing Spring Boot ecosystem. Use **Quarkus + LangChain4j** if you are building net-new, highly scalable serverless AI functions or scaling to zero in Kubernetes.
+</Callout>
 
 ## The Verdict
 
-JDK 26 is the point where Java transitions from being "just the backend" to being a first-class citizen in the AI ecosystem. By combining low-level JVM enhancements (FFM, Vector API, HTTP/3) with high-level, supported frameworks (Helidon AI within the JVP), architects can build end-to-end agentic systems that are strongly typed, easily monitored, and massively scalable.
+JDK 26 is the point where Java transitions from being "just the backend" to being a first-class citizen in the AI ecosystem. By combining low-level JVM enhancements with high-level, production-hardened frameworks, architects can build end-to-end agentic systems that are strongly typed, secure, and massively scalable.
