@@ -18,6 +18,8 @@ const { title, description, track, jdkVersion, featureStatus, difficulty, publis
 
 // Filter for only H2 and H3 for TOC
 const toc = headings.filter(h => h.depth === 2 || h.depth === 3);
+// Check if we actually have enough headings to render a TOC
+const hasToc = toc.length >= 3;
 
 const trackLabels: Record<string, string> = {
   java: 'Modern Java',
@@ -29,7 +31,8 @@ const dateStr = publishDate.toLocaleDateString('en-US', { year: 'numeric', month
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <BaseLayout title={`${title} — Modern Java`} description={description}>
-  <div class="post-grid">
+  <!-- Dynamically apply 'has-toc' class based on the heading count -->
+  <div class={`post-grid ${hasToc ? 'has-toc' : ''}`.trim()}>
     <article>
       <header class="article-header">
         <span class="track-label">{trackLabels[track] ?? track}</span>
@@ -61,7 +64,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       )}
     </article>
 
-    {toc.length >= 3 && (
+    {hasToc && (
       <nav class="toc-sidebar">
         <h4>On this page</h4>
         <ul>
@@ -81,7 +84,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   .post-grid { display: grid; grid-template-columns: 1fr; gap: 4rem; }
   
   @media (min-width: 1024px) {
-    .post-grid { grid-template-columns: 1fr 240px; }
+    /* ONLY apply the 240px column if the has-toc class is present */
+    .post-grid.has-toc { grid-template-columns: 1fr 240px; }
     .toc-sidebar { position: sticky; top: 2rem; height: fit-content; }
   }
 
@@ -97,7 +101,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   .tags-container { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 </style>
 
-<!-- Add this NEW global style block for the dynamic Mermaid classes -->
+<!-- Global style block for the dynamic Mermaid classes -->
 <style is:global>
   .mermaid {
     position: relative;
@@ -215,8 +219,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       button.setAttribute('aria-label', 'Copy code');
       button.setAttribute('title', 'Copy code');
 
-      const copyIcon = `<svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
-      const checkIcon = `<svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" fill="none" viewBox="0 0 24 24" stroke="#35C9B0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
+      const copyIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+      const checkIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#35C9B0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>`;
 
       button.innerHTML = copyIcon;
       block.appendChild(button);
