@@ -1,0 +1,47 @@
+---
+title: "Building an Enterprise-Ready AI Predictive Maintenance Platform"
+pubDate: 2026-08-01
+description: "Architecting a fault-tolerant, AI-driven predictive maintenance engine using Spring Boot, React, Hugging Face, and Resilience4j."
+author: "Raghu"
+tags: ["Java", "Spring Boot", "AI/ML", "Architecture", "Resilience4j", "Observability"]
+layout: "../../layouts/BlogPostLayout.astro"
+---
+
+# Building an Enterprise-Ready AI Predictive Maintenance Platform
+
+Integrating Artificial Intelligence and Machine Learning models into traditional enterprise environments requires more than just making an API call. It demands a rigorous approach to fault tolerance, observability, and system design. 
+
+In this project, I architected a full-stack **Predictive Maintenance Platform** designed to analyze engine telemetry data (RPM, oil pressure, vibration, etc.) and predict potential failures using an AI model hosted on Hugging Face.
+
+---
+
+## The Purpose
+
+The goal of this system is to transition maintenance strategies from reactive to proactive. By continuously monitoring asset health through sensor readings, the application leverages a machine learning inference engine to calculate failure probabilities and recommend actions before catastrophic breakdowns occur.
+
+Crucially, the platform is designed with an "AI-first" architectural mindset. Since external ML inference services can experience latency spikes, rate limits, or outages, the system cannot afford to crash when the AI is unavailable. It is engineered to fail gracefully, maintain high availability, and provide deep visibility into performance metrics.
+
+---
+
+## High-Level Design (HLD)
+
+The system follows a modern, decoupled architecture, prioritizing application-level resilience and comprehensive telemetry.
+
+```mermaid
+graph TD
+    Client[React UI] -->|REST / JSON| API[Spring Boot API]
+    API -->|Persists Data| DB[(PostgreSQL)]
+    
+    subgraph "Resilience Layer"
+        API --> CB[Resilience4j Circuit Breaker]
+        CB --> Retry[Retry & TimeLimiter]
+        Retry --> Bulkhead[Thread Bulkhead]
+    end
+    
+    Bulkhead -->|Async Inference| HF[Hugging Face ML Endpoint]
+    
+    subgraph "Observability Stack"
+        API -.->|MDC / JSON Logs| Logs[Structured Logging]
+        API -.->|Micrometer Metrics| Prom[Prometheus]
+        Prom -.-> Grafana[Grafana Dashboards]
+    end
