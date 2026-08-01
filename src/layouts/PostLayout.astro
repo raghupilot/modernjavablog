@@ -94,6 +94,63 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   .article-tags { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
   .article-tags h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem; }
   .tags-container { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  
+  /* Add these Mermaid styles to your existing <style> block */
+  .mermaid {
+    position: relative;
+    background: var(--bg-surface, #1e1e1e);
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+    overflow: auto; /* Allows panning if it's too wide normally */
+  }
+
+  .enlarge-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: var(--text-secondary, #ccc);
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .enlarge-btn:hover {
+    background: #3a3a3a;
+    color: #fff;
+  }
+
+  /* Fullscreen Modal State */
+  .mermaid.is-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: rgba(15, 15, 15, 0.95);
+    margin: 0;
+    border-radius: 0;
+    padding: 4rem;
+    align-items: center;
+  }
+
+  /* Force the SVG to scale up when in fullscreen */
+  .mermaid.is-fullscreen svg {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: 100% !important; 
+    height: auto !important;
+  }
 </style>
 
 <script>
@@ -110,7 +167,35 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     const mermaidElements = document.querySelectorAll('.mermaid');
     if (mermaidElements.length > 0) {
       try {
+        // Wait for Mermaid to convert the text into an SVG
         await mermaid.run({ querySelector: '.mermaid' });
+
+        // Add the Enlarge button to each diagram
+        const expandIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>`;
+        const closeIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>`;
+
+        document.querySelectorAll('.mermaid').forEach((container) => {
+          const btn = document.createElement('button');
+          btn.className = 'enlarge-btn';
+          btn.setAttribute('aria-label', 'Toggle fullscreen');
+          btn.setAttribute('title', 'Enlarge diagram');
+          btn.innerHTML = expandIcon;
+
+          btn.addEventListener('click', () => {
+            const isFullscreen = container.classList.toggle('is-fullscreen');
+            
+            if (isFullscreen) {
+              document.body.style.overflow = 'hidden'; // Prevent page scrolling in background
+              btn.innerHTML = closeIcon;
+            } else {
+              document.body.style.overflow = ''; // Restore page scrolling
+              btn.innerHTML = expandIcon;
+            }
+          });
+
+          container.appendChild(btn);
+        });
+
       } catch (err) {
         console.error('Mermaid failed to render:', err);
       }
