@@ -97,10 +97,21 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 </style>
 
 <script>
+  import mermaid from 'mermaid';
+  
+  // Initialize Mermaid for diagrams
+  mermaid.initialize({ 
+    startOnLoad: true, 
+    theme: 'dark' 
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     const codeBlocks = document.querySelectorAll('pre');
 
     codeBlocks.forEach((block) => {
+      // Skip adding the copy button to Mermaid diagram blocks
+      if (block.classList.contains('mermaid')) return;
+
       const button = document.createElement('button');
       button.className = 'copy-code-btn';
       button.setAttribute('aria-label', 'Copy code');
