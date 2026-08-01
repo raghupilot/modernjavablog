@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import mermaid from 'astro-mermaid'; // Import the mermaid integration
 
 // When deployed to GitHub Pages as a *project* site (username.github.io/repo-name),
 // the site is served from a subpath, so `base` must match the repo name.
@@ -12,7 +13,10 @@ const base = process.env.BASE_PATH || '/';
 export default defineConfig({
   site,
   base,
-  integrations: [mdx()],
+  integrations: [
+    mermaid({ theme: 'default', autoTheme: true }), // Add mermaid here, before mdx()
+    mdx()
+  ],
   markdown: {
     shikiConfig: {
       theme: 'github-dark',
