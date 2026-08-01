@@ -9,7 +9,6 @@ const allPosts = (await getCollection('posts', ({ data }) => !data.draft))
 const trackLabels: Record<string, string> = {
   java: 'Modern Java',
   enterprise: 'Enterprise Patterns',
-  'agentic-ai': 'Agentic AI',
 };
 ---
 <BaseLayout title="Modern Java Architecture Blog">
@@ -18,8 +17,7 @@ const trackLabels: Record<string, string> = {
       Engineering at Scale
     </h1>
     <p class="post-desc text-lg text-slate-600 max-w-2xl">
-      Modern Java features, distributed systems patterns, and agentic AI — explained with the
-      architectural context you need to actually use them.
+      Modern Java internals, application-level fault tolerance, and bridging the gap between enterprise backend and AI/ML.
     </p>
   </section>
 
