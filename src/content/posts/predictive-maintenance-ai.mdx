@@ -27,7 +27,7 @@ Crucially, the platform is designed with an "AI-first" architectural mindset. Si
 
 The system follows a modern, decoupled architecture, prioritizing application-level resilience and comprehensive telemetry.
 
-```mermaid
+<div class="mermaid">{`
 graph TD
     Client[React UI] -->|REST / JSON| API[Spring Boot API]
     API -->|Persists Data| DB[(PostgreSQL)]
@@ -45,3 +45,4 @@ graph TD
         API -.->|Micrometer Metrics| Prom[Prometheus]
         Prom -.-> Grafana[Grafana Dashboards]
     end
+`}</div>
