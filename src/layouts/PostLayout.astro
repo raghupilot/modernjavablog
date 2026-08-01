@@ -99,17 +99,41 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <script>
   import mermaid from 'mermaid';
   
-  // Initialize Mermaid for diagrams
+  // Set startOnLoad to false so we can control exactly when it renders
   mermaid.initialize({ 
-    startOnLoad: true, 
+    startOnLoad: false, 
     theme: 'dark' 
   });
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const codeBlocks = document.querySelectorAll('pre');
+  document.addEventListener('DOMContentLoaded', async () => {
+    
+    // 1. Handle Mermaid Diagrams
+    // Find standard Astro MDX mermaid blocks
+    const mermaidCodes = document.querySelectorAll('code.language-mermaid');
+    
+    mermaidCodes.forEach((codeBlock) => {
+      const pre = codeBlock.parentElement;
+      if (pre) {
+        // Change the class so Mermaid's engine targets it
+        pre.className = 'mermaid'; 
+        // Using textContent restores the newlines and unescapes HTML entities!
+        pre.textContent = codeBlock.textContent; 
+      }
+    });
 
+    if (mermaidCodes.length > 0) {
+      try {
+        await mermaid.run({ querySelector: '.mermaid' });
+      } catch (err) {
+        console.error('Mermaid failed to render:', err);
+      }
+    }
+
+    // 2. Handle Copy Code Buttons
+    const codeBlocks = document.querySelectorAll('pre');
+    
     codeBlocks.forEach((block) => {
-      // Skip adding the copy button to Mermaid diagram blocks
+      // Skip the diagram blocks so we don't add a copy button to the SVG
       if (block.classList.contains('mermaid')) return;
 
       const button = document.createElement('button');
